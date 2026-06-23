@@ -13,18 +13,16 @@ var DB *gorm.DB
 
 func ConnectDB() {
 
-	err := godotenv.Load()
-	if err != nil {
-		panic("Error loading .env file")
-	}
+	_ = godotenv.Load()
 
 	dsn := os.Getenv("DATABASE_URL")
 
-	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatal("Failed to connect to database:", err)
+		log.Fatal("Failed to connect database:", err)
 	}
 
-	log.Println("Connected to Neon PostgreSQL successfully!")
+	DB = db
 
+	log.Println("Database connected successfully")
 }
