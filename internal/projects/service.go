@@ -23,8 +23,8 @@ func CreateProjectService(
 		Title:       req.Title,
 		Description: req.Description,
 		Status:      "active",
+		IsArchived:  req.IsArchived,
 	}
-
 	err = CreateProject(&project)
 
 	if err != nil {

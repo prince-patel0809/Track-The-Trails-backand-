@@ -12,6 +12,7 @@ type Project struct {
 	Title       string    `gorm:"column:title"`
 	Description string    `gorm:"column:description"`
 	Status      string    `gorm:"column:status"`
+	IsArchived  bool      `gorm:"column:is_archived"`
 	CreatedAt   time.Time `gorm:"column:created_at"`
 	UpdatedAt   time.Time `gorm:"column:updated_at"`
 }
