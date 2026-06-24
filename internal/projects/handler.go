@@ -130,3 +130,43 @@ func GetMyProjectsHandler(c *gin.Context) {
 		"projects": projects,
 	})
 }
+
+func GetProjectHandler(c *gin.Context) {
+
+	projectID := c.Param("id")
+
+	userID := c.MustGet("userID").(string)
+
+	project, err := GetProjectService(projectID, userID)
+
+	if err != nil {
+
+		switch err.Error() {
+
+		case "project not found":
+			c.JSON(http.StatusNotFound, gin.H{
+				"success": false,
+				"message": "Project not found",
+			})
+
+		case "unauthorized":
+			c.JSON(http.StatusForbidden, gin.H{
+				"success": false,
+				"message": "Access denied",
+			})
+
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"message": err.Error(),
+			})
+		}
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"project": project,
+	})
+}

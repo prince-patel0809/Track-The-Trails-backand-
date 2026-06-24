@@ -85,3 +85,22 @@ func GetMyProjects(userID string) ([]Project, error) {
 
 	return projects, nil
 }
+
+func GetProjectService(projectID string, userID string) (*Project, error) {
+
+	project, err := GetProjectByID(projectID)
+
+	if err != nil {
+		return nil, errors.New("failed to fetch project")
+	}
+
+	if project == nil {
+		return nil, errors.New("project not found")
+	}
+
+	if project.OwnerID.String() != userID {
+		return nil, errors.New("unauthorized")
+	}
+
+	return project, nil
+}

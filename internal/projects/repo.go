@@ -16,26 +16,6 @@ func UpdateProject(project *Project) error {
 	return config.DB.Save(project).Error
 }
 
-func GetProjectByID(id string) (*Project, error) {
-
-	var project Project
-
-	err := config.DB.
-		Where("id = ?", id).
-		First(&project).Error
-
-	if err != nil {
-
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, nil
-		}
-
-		return nil, err
-	}
-
-	return &project, nil
-}
-
 func GetProjectsByOwner(ownerID string) ([]Project, error) {
 
 	var projects []Project
@@ -50,4 +30,24 @@ func GetProjectsByOwner(ownerID string) ([]Project, error) {
 	}
 
 	return projects, nil
+}
+
+func GetProjectByID(projectID string) (*Project, error) {
+
+	var project Project
+
+	err := config.DB.
+		Where("id = ?", projectID).
+		First(&project).Error
+
+	if err != nil {
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	return &project, nil
 }

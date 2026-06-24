@@ -31,5 +31,6 @@ func SetupRoutes(r *gin.Engine) {
 		projectGroup.POST("/create", projects.CreateProjectHandler)
 		projectGroup.PUT("/update/:id", projects.UpdateProjectHandler)
 		projectGroup.GET("/GetAllProjects", projects.GetMyProjectsHandler)
+		projectGroup.GET("GetProject/:id", projects.GetProjectHandler)
 	}
 }
