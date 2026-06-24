@@ -74,3 +74,14 @@ func UpdateProjectService(
 
 	return nil
 }
+
+func GetMyProjects(userID string) ([]Project, error) {
+
+	projects, err := GetProjectsByOwner(userID)
+
+	if err != nil {
+		return nil, errors.New("failed to fetch projects")
+	}
+
+	return projects, nil
+}

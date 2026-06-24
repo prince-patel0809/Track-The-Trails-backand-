@@ -35,3 +35,19 @@ func GetProjectByID(id string) (*Project, error) {
 
 	return &project, nil
 }
+
+func GetProjectsByOwner(ownerID string) ([]Project, error) {
+
+	var projects []Project
+
+	err := config.DB.
+		Where("owner_id = ?", ownerID).
+		Order("created_at DESC").
+		Find(&projects).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return projects, nil
+}

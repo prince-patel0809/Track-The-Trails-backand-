@@ -107,3 +107,26 @@ func UpdateProjectHandler(c *gin.Context) {
 		"message": "Project updated successfully",
 	})
 }
+
+func GetMyProjectsHandler(c *gin.Context) {
+
+	userID := c.MustGet("userID").(string)
+
+	projects, err := GetMyProjects(userID)
+
+	if err != nil {
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success":  true,
+		"count":    len(projects),
+		"projects": projects,
+	})
+}
