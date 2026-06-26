@@ -34,4 +34,10 @@ func SetupRoutes(r *gin.Engine) {
 		projectGroup.GET("/GetProject/:id", projects.GetProjectHandler)
 		projectGroup.POST("/:id/members", middleware.JWTAuthMiddleware(), projects.AddMemberHandler)
 	}
+
+	userGroup := api.Group("/users")
+	userGroup.Use(middleware.JWTAuthMiddleware())
+	{
+		userGroup.GET("/GetAll", projects.GetAllUsersHandler)
+	}
 }

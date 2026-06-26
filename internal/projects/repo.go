@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/yourusername/track-the-trails/config"
+	"github.com/yourusername/track-the-trails/internal/auth"
 	"gorm.io/gorm"
 )
 
@@ -102,4 +103,19 @@ func IsAlreadyMember(projectID, userID string) (bool, error) {
 	}
 
 	return count > 0, nil
+}
+
+func GetAllUsers() ([]auth.User, error) {
+
+	var users []auth.User
+
+	err := config.DB.
+		Order("created_at DESC").
+		Find(&users).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return users, nil
 }

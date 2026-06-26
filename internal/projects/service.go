@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
+	"github.com/yourusername/track-the-trails/internal/auth"
 )
 
 func CreateProjectService(
@@ -153,4 +154,15 @@ func AddMemberService(projectID string, ownerID string, req AddMemberRequest) er
 	}
 
 	return AddMember(&member)
+}
+
+func GetAllUsersService() ([]auth.User, error) {
+
+	users, err := GetAllUsers()
+
+	if err != nil {
+		return nil, errors.New("failed to fetch users")
+	}
+
+	return users, nil
 }
