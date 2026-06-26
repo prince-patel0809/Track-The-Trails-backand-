@@ -51,3 +51,55 @@ func GetProjectByID(projectID string) (*Project, error) {
 
 	return &project, nil
 }
+
+func GetProjectById(projectID string) (*Project, error) {
+
+	var project Project
+
+	err := config.DB.
+		Where("id = ?", projectID).
+		First(&project).Error
+
+	if err != nil {
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	return &project, nil
+}
+
+func UserExists(userID string) (bool, error) {
+
+	var count int64
+
+	err := config.DB.
+		Table("users").
+		Where("id = ?", userID).
+		Count(&count).Error
+
+	if err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
+}
+
+func IsAlreadyMember(projectID, userID string) (bool, error) {
+
+	var count int64
+
+	err := config.DB.
+		Table("project_members").
+		Where("project_id = ? AND user_id = ?", projectID, userID).
+		Count(&count).Error
+
+	if err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
+}

@@ -104,3 +104,53 @@ func GetProjectService(projectID string, userID string) (*Project, error) {
 
 	return project, nil
 }
+
+func AddMemberService(projectID string, ownerID string, req AddMemberRequest) error {
+
+	project, err := GetProjectById(projectID)
+
+	if err != nil {
+		return errors.New("failed to fetch project")
+	}
+
+	if project == nil {
+		return errors.New("project not found")
+	}
+
+	// Only Owner
+	if project.OwnerID.String() != ownerID {
+		return errors.New("only owner can add members")
+	}
+
+	exists, err := UserExists(req.UserID)
+
+	if err != nil {
+		return errors.New("failed to verify user")
+	}
+
+	if !exists {
+		return errors.New("user not found")
+	}
+
+	memberExists, err := IsAlreadyMember(projectID, req.UserID)
+
+	if err != nil {
+		return errors.New("failed to verify member")
+	}
+
+	if memberExists {
+		return errors.New("user already exists in project")
+	}
+
+	projectUUID, _ := uuid.Parse(projectID)
+	userUUID, _ := uuid.Parse(req.UserID)
+
+	member := ProjectMember{
+		ID:        uuid.New(),
+		ProjectID: projectUUID,
+		UserID:    userUUID,
+		Role:      "member",
+	}
+
+	return AddMember(&member)
+}

@@ -11,3 +11,7 @@ type UpdateProjectRequest struct {
 	Description string `json:"description"`
 	Status      string `json:"status"`
 }
+
+type AddMemberRequest struct {
+	UserID string `json:"user_id" binding:"required,uuid"`
+}

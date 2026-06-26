@@ -170,3 +170,66 @@ func GetProjectHandler(c *gin.Context) {
 		"project": project,
 	})
 }
+
+func AddMemberHandler(c *gin.Context) {
+
+	projectID := c.Param("id")
+
+	ownerID := c.MustGet("userID").(string)
+
+	var req AddMemberRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "Invalid request",
+		})
+		return
+	}
+
+	err := AddMemberService(projectID, ownerID, req)
+
+	if err != nil {
+
+		switch err.Error() {
+
+		case "project not found":
+			c.JSON(http.StatusNotFound, gin.H{
+				"success": false,
+				"message": "Project not found",
+			})
+
+		case "only owner can add members":
+			c.JSON(http.StatusForbidden, gin.H{
+				"success": false,
+				"message": "Only the project owner can add members",
+			})
+
+		case "user not found":
+			c.JSON(http.StatusNotFound, gin.H{
+				"success": false,
+				"message": "User not found",
+			})
+
+		case "user already exists in project":
+			c.JSON(http.StatusConflict, gin.H{
+				"success": false,
+				"message": "User is already a member of this project",
+			})
+
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"message": err.Error(),
+			})
+		}
+
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"success": true,
+		"message": "Member added successfully",
+	})
+}
