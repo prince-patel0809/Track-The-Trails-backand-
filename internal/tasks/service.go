@@ -74,7 +74,7 @@ func AssignTaskService(
 func GetMyTasksService(
 	projectID string,
 	userID string,
-) ([]Task, error) {
+) ([]TaskResponse, error) {
 
 	project, err := projects.GetProjectByID(projectID)
 
@@ -102,7 +102,7 @@ func GetMyTasksService(
 func GetProjectTasksService(
 	projectID string,
 	userID string,
-) ([]Task, error) {
+) ([]TaskResponse, error) {
 
 	project, err := projects.GetProjectByID(projectID)
 
@@ -116,7 +116,7 @@ func GetProjectTasksService(
 
 	// Owner can see all tasks
 	if project.OwnerID.String() == userID {
-		return GetAllProjectTasks(projectID)
+		return GetMyTasks(projectID, userID)
 	}
 
 	// Check member

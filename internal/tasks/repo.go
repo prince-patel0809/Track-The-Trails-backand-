@@ -50,14 +50,31 @@ func IsProjectMember(projectID string, userID string) (bool, error) {
 	return count > 0, nil
 }
 
-func GetMyTasks(projectID string, userID string) ([]Task, error) {
+func GetMyTasks(projectID string, userID string) ([]TaskResponse, error) {
 
-	var tasks []Task
+	var tasks []TaskResponse
 
 	err := config.DB.
-		Where("project_id = ? AND assigned_to = ?", projectID, userID).
-		Order("created_at DESC").
-		Find(&tasks).Error
+		Table("tasks t").
+		Select(`
+			t.id,
+			t.project_id,
+			t.assigned_by,
+			assigner.name AS assigned_by_name,
+			t.assigned_to,
+			assignee.name AS assigned_to_name,
+			t.title,
+			t.description,
+			t.priority,
+			t.status,
+			t.due_date,
+			t.created_at
+		`).
+		Joins("JOIN users assigner ON assigner.id = t.assigned_by").
+		Joins("JOIN users assignee ON assignee.id = t.assigned_to").
+		Where("t.project_id = ? AND t.assigned_to = ?", projectID, userID).
+		Order("t.created_at DESC").
+		Scan(&tasks).Error
 
 	if err != nil {
 		return nil, err
