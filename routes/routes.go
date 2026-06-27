@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/yourusername/track-the-trails/internal/auth"
 	"github.com/yourusername/track-the-trails/internal/projects"
+	"github.com/yourusername/track-the-trails/internal/tasks"
 	"github.com/yourusername/track-the-trails/middleware"
 )
 
@@ -40,5 +41,12 @@ func SetupRoutes(r *gin.Engine) {
 	userGroup.Use(middleware.JWTAuthMiddleware())
 	{
 		userGroup.GET("/GetAll", projects.GetAllUsersHandler)
+	}
+
+	TaskGroup := api.Group("/tasks")
+	TaskGroup.Use(middleware.JWTAuthMiddleware())
+	{
+		TaskGroup.POST("/:id/assign", tasks.AssignTaskHandler)
+		TaskGroup.GET("/:id/Gettasksbyuser", middleware.JWTAuthMiddleware(), tasks.GetProjectTasksHandler)
 	}
 }
