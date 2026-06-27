@@ -114,9 +114,8 @@ func GetProjectTasksService(
 		return nil, errors.New("project not found")
 	}
 
-	// Owner can see all tasks
 	if project.OwnerID.String() == userID {
-		return GetMyTasks(projectID, userID)
+		return GetAllProjectTasks(projectID)
 	}
 
 	// Check member

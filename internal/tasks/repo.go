@@ -82,14 +82,48 @@ func GetMyTasks(projectID string, userID string) ([]TaskResponse, error) {
 
 	return tasks, nil
 }
-func GetAllProjectTasks(projectID string) ([]Task, error) {
 
-	var tasks []Task
+// func GetAllProjectTasks(projectID string) ([]Task, error) {
+
+// 	var tasks []Task
+
+// 	err := config.DB.
+// 		Where("project_id = ?", projectID).
+// 		Order("created_at DESC").
+// 		Find(&tasks).Error
+
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	return tasks, nil
+// }
+
+func GetAllProjectTasks(projectID string) ([]TaskResponse, error) {
+
+	var tasks []TaskResponse
 
 	err := config.DB.
-		Where("project_id = ?", projectID).
-		Order("created_at DESC").
-		Find(&tasks).Error
+		Table("tasks t").
+		Select(`
+			t.id,
+			t.project_id,
+			t.assigned_by,
+			assigner.name AS assigned_by_name,
+			t.assigned_to,
+			assignee.name AS assigned_to_name,
+			t.title,
+			t.description,
+			t.priority,
+			t.status,
+			t.due_date,
+			t.created_at
+		`).
+		Joins("LEFT JOIN users assigner ON assigner.id = t.assigned_by").
+		Joins("LEFT JOIN users assignee ON assignee.id = t.assigned_to").
+		Where("t.project_id = ?", projectID).
+		Order("t.created_at DESC").
+		Scan(&tasks).Error
 
 	if err != nil {
 		return nil, err
