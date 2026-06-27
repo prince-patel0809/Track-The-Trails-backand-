@@ -166,3 +166,26 @@ func GetAllUsersService() ([]auth.User, error) {
 
 	return users, nil
 }
+
+func GetProjectMembersService(
+	projectID string,
+	userID string,
+) ([]MemberResponse, error) {
+
+	project, err := GetProjectByID(projectID)
+
+	if err != nil {
+		return nil, errors.New("failed to fetch project")
+	}
+
+	if project == nil {
+		return nil, errors.New("project not found")
+	}
+
+	// Only owner can view members
+	if project.OwnerID.String() != userID {
+		return nil, errors.New("unauthorized")
+	}
+
+	return GetProjectMembers(projectID)
+}

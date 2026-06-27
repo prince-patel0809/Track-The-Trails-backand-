@@ -119,3 +119,30 @@ func GetAllUsers() ([]auth.User, error) {
 
 	return users, nil
 }
+
+func GetProjectMembers(projectID string) ([]MemberResponse, error) {
+
+	var members []MemberResponse
+
+	err := config.DB.
+		Table("project_members pm").
+		Select(`
+			u.id,
+			u.name,
+			u.email,
+			u.bio,
+			u.theme,
+			pm.role,
+			pm.joined_at
+		`).
+		Joins("JOIN users u ON u.id = pm.user_id").
+		Where("pm.project_id = ?", projectID).
+		Order("pm.joined_at ASC").
+		Scan(&members).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return members, nil
+}

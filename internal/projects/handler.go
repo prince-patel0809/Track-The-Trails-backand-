@@ -254,3 +254,49 @@ func GetAllUsersHandler(c *gin.Context) {
 		"users":   users,
 	})
 }
+
+func GetProjectMembersHandler(c *gin.Context) {
+
+	projectID := c.Param("id")
+	userID := c.MustGet("userID").(string)
+
+	members, err := GetProjectMembersService(
+		projectID,
+		userID,
+	)
+
+	if err != nil {
+
+		switch err.Error() {
+
+		case "project not found":
+
+			c.JSON(http.StatusNotFound, gin.H{
+				"success": false,
+				"message": "Project not found",
+			})
+
+		case "unauthorized":
+
+			c.JSON(http.StatusForbidden, gin.H{
+				"success": false,
+				"message": "Only the project owner can view members",
+			})
+
+		default:
+
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"message": err.Error(),
+			})
+		}
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"count":   len(members),
+		"members": members,
+	})
+}
