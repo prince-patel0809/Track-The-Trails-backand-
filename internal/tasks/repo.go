@@ -131,3 +131,36 @@ func GetAllProjectTasks(projectID string) ([]TaskResponse, error) {
 
 	return tasks, nil
 }
+
+func GetMemberTasks(projectID string, memberID string) ([]TaskResponse, error) {
+
+	var tasks []TaskResponse
+
+	err := config.DB.
+		Table("tasks t").
+		Select(`
+			t.id,
+			t.project_id,
+			t.assigned_by,
+			assigner.name AS assigned_by_name,
+			t.assigned_to,
+			assignee.name AS assigned_to_name,
+			t.title,
+			t.description,
+			t.priority,
+			t.status,
+			t.due_date,
+			t.created_at
+		`).
+		Joins("LEFT JOIN users assigner ON assigner.id = t.assigned_by").
+		Joins("LEFT JOIN users assignee ON assignee.id = t.assigned_to").
+		Where("t.project_id = ? AND t.assigned_to = ?", projectID, memberID).
+		Order("t.due_date ASC").
+		Scan(&tasks).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return tasks, nil
+}

@@ -132,3 +132,37 @@ func GetProjectTasksService(
 	// Member sees only their own tasks
 	return GetMyTasks(projectID, userID)
 }
+
+func GetMemberTasksService(
+	projectID string,
+	memberID string,
+	ownerID string,
+) ([]TaskResponse, error) {
+
+	project, err := projects.GetProjectByID(projectID)
+
+	if err != nil {
+		return nil, errors.New("failed to fetch project")
+	}
+
+	if project == nil {
+		return nil, errors.New("project not found")
+	}
+
+	// Only owner can view another member's tasks
+	if project.OwnerID.String() != ownerID {
+		return nil, errors.New("only owner can access this")
+	}
+
+	isMember, err := IsProjectMember(projectID, memberID)
+
+	if err != nil {
+		return nil, errors.New("failed to verify member")
+	}
+
+	if !isMember {
+		return nil, errors.New("user is not a member")
+	}
+
+	return GetMemberTasks(projectID, memberID)
+}

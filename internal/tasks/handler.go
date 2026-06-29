@@ -145,3 +145,32 @@ func GetProjectTasksHandler(c *gin.Context) {
 		"tasks":   tasks,
 	})
 }
+
+func GetMemberTasksHandler(c *gin.Context) {
+
+	projectID := c.Param("id")
+	memberID := c.Param("userId")
+	ownerID := c.MustGet("userID").(string)
+
+	tasks, err := GetMemberTasksService(
+		projectID,
+		memberID,
+		ownerID,
+	)
+
+	if err != nil {
+
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"count":   len(tasks),
+		"tasks":   tasks,
+	})
+}
