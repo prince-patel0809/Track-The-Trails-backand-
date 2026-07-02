@@ -166,3 +166,26 @@ func GetMemberTasksService(
 
 	return GetMemberTasks(projectID, memberID)
 }
+
+type DashboardResponse struct {
+	OwnerTasks []DashboardTaskResponse `json:"owner_tasks"`
+	MyTasks    []DashboardTaskResponse `json:"my_tasks"`
+}
+
+func GetDashboardTasks(userID string) (*DashboardResponse, error) {
+
+	ownerTasks, err := GetOwnerTasks(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	myTasks, err := GetAssignedTasks(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &DashboardResponse{
+		OwnerTasks: ownerTasks,
+		MyTasks:    myTasks,
+	}, nil
+}

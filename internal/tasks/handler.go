@@ -174,3 +174,23 @@ func GetMemberTasksHandler(c *gin.Context) {
 		"tasks":   tasks,
 	})
 }
+
+func GetDashboardTasksHandler(c *gin.Context) {
+
+	userID := c.MustGet("userID").(string)
+
+	data, err := GetDashboardTasks(userID)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "Failed to fetch dashboard tasks",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    data,
+	})
+}

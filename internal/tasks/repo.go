@@ -164,3 +164,71 @@ func GetMemberTasks(projectID string, memberID string) ([]TaskResponse, error) {
 
 	return tasks, nil
 }
+
+func GetOwnerTasks(ownerID string) ([]DashboardTaskResponse, error) {
+
+	var tasks []DashboardTaskResponse
+
+	err := config.DB.
+		Table("tasks t").
+		Select(`
+			t.id AS task_id,
+			t.project_id,
+			p.title AS project_title,
+
+			t.assigned_by,
+			assigner.name AS assigned_by_name,
+
+			t.assigned_to,
+			assignee.name AS assigned_to_name,
+
+			t.title,
+			t.description,
+			t.priority,
+			t.status,
+			t.due_date,
+			t.created_at
+		`).
+		Joins("JOIN projects p ON p.id = t.project_id").
+		Joins("JOIN users assigner ON assigner.id = t.assigned_by").
+		Joins("JOIN users assignee ON assignee.id = t.assigned_to").
+		Where("p.owner_id = ?", ownerID).
+		Order("t.due_date ASC").
+		Scan(&tasks).Error
+
+	return tasks, err
+}
+
+func GetAssignedTasks(userID string) ([]DashboardTaskResponse, error) {
+
+	var tasks []DashboardTaskResponse
+
+	err := config.DB.
+		Table("tasks t").
+		Select(`
+			t.id AS task_id,
+			t.project_id,
+			p.title AS project_title,
+
+			t.assigned_by,
+			assigner.name AS assigned_by_name,
+
+			t.assigned_to,
+			assignee.name AS assigned_to_name,
+
+			t.title,
+			t.description,
+			t.priority,
+			t.status,
+			t.due_date,
+			t.created_at
+		`).
+		Joins("JOIN projects p ON p.id = t.project_id").
+		Joins("JOIN users assigner ON assigner.id = t.assigned_by").
+		Joins("JOIN users assignee ON assignee.id = t.assigned_to").
+		Where("t.assigned_to = ?", userID).
+		Order("t.due_date ASC").
+		Scan(&tasks).Error
+
+	return tasks, err
+}
