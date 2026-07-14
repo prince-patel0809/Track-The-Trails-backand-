@@ -48,3 +48,7 @@ type DashboardTaskResponse struct {
 	DueDate   time.Time `json:"due_date"`
 	CreatedAt time.Time `json:"created_at"`
 }
+
+type UpdateTaskStatusRequest struct {
+	Status string `json:"status" binding:"required"`
+}

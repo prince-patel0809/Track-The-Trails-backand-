@@ -50,5 +50,6 @@ func SetupRoutes(r *gin.Engine) {
 		TaskGroup.GET("/:id/Gettasksbyuser", middleware.JWTAuthMiddleware(), tasks.GetProjectTasksHandler)
 		TaskGroup.GET("/:id/members/:userId/tasks", middleware.JWTAuthMiddleware(), tasks.GetMemberTasksHandler)
 		TaskGroup.GET("/dashboard", middleware.JWTAuthMiddleware(), tasks.GetDashboardTasksHandler)
+		TaskGroup.PATCH("/:taskId/status", middleware.JWTAuthMiddleware(), tasks.UpdateTaskStatusHandler)
 	}
 }

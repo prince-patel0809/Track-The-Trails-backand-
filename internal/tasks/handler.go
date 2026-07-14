@@ -194,3 +194,67 @@ func GetDashboardTasksHandler(c *gin.Context) {
 		"data":    data,
 	})
 }
+
+func UpdateTaskStatusHandler(c *gin.Context) {
+
+	taskID := c.Param("taskId")
+
+	userID := c.MustGet("userID").(string)
+
+	var req UpdateTaskStatusRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "Invalid request body",
+			"error":   err.Error(),
+		})
+
+		return
+	}
+
+	err := UpdateTaskStatusService(taskID, userID, req)
+
+	if err != nil {
+
+		switch err.Error() {
+
+		case "task not found":
+
+			c.JSON(http.StatusNotFound, gin.H{
+				"success": false,
+				"message": "Task not found",
+			})
+
+		case "unauthorized":
+
+			c.JSON(http.StatusForbidden, gin.H{
+				"success": false,
+				"message": "Only the assigned member can update the task status",
+			})
+
+		case "invalid status":
+
+			c.JSON(http.StatusBadRequest, gin.H{
+				"success": false,
+				"message": "Invalid task status",
+			})
+
+		default:
+
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"message": err.Error(),
+			})
+
+		}
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Task status updated successfully",
+	})
+}

@@ -232,3 +232,29 @@ func GetAssignedTasks(userID string) ([]DashboardTaskResponse, error) {
 
 	return tasks, err
 }
+
+func GetTaskByID(taskID string) (*Task, error) {
+
+	var task Task
+
+	err := config.DB.
+		Where("id = ?", taskID).
+		First(&task).Error
+
+	if err != nil {
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	return &task, nil
+}
+
+func UpdateTask(task *Task) error {
+
+	return config.DB.Save(task).Error
+
+}

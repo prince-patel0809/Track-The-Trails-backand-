@@ -189,3 +189,51 @@ func GetDashboardTasks(userID string) (*DashboardResponse, error) {
 		MyTasks:    myTasks,
 	}, nil
 }
+
+func UpdateTaskStatusService(
+	taskID string,
+	userID string,
+	req UpdateTaskStatusRequest,
+) error {
+
+	task, err := GetTaskByID(taskID)
+
+	if err != nil {
+		return errors.New("failed to fetch task")
+	}
+
+	if task == nil {
+		return errors.New("task not found")
+	}
+
+	// Only assigned member can update status
+	if task.AssignedTo.String() != userID {
+		return errors.New("unauthorized")
+	}
+
+	switch req.Status {
+
+	case "pending", "in_progress", "completed", "cancelled":
+
+	default:
+		return errors.New("invalid status")
+	}
+
+	task.Status = req.Status
+
+	// Save completion time
+	if req.Status == "completed" {
+		now := time.Now()
+		task.CompletedAt = &now
+	} else {
+		task.CompletedAt = nil
+	}
+
+	err = UpdateTask(task)
+
+	if err != nil {
+		return errors.New("failed to update task")
+	}
+
+	return nil
+}
