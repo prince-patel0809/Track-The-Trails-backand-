@@ -3,6 +3,7 @@ package routes
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/yourusername/track-the-trails/internal/auth"
+	"github.com/yourusername/track-the-trails/internal/dashboard"
 	"github.com/yourusername/track-the-trails/internal/projects"
 	"github.com/yourusername/track-the-trails/internal/tasks"
 	"github.com/yourusername/track-the-trails/middleware"
@@ -51,5 +52,11 @@ func SetupRoutes(r *gin.Engine) {
 		TaskGroup.GET("/:id/members/:userId/tasks", middleware.JWTAuthMiddleware(), tasks.GetMemberTasksHandler)
 		TaskGroup.GET("/dashboard", middleware.JWTAuthMiddleware(), tasks.GetDashboardTasksHandler)
 		TaskGroup.PATCH("/:taskId/status", middleware.JWTAuthMiddleware(), tasks.UpdateTaskStatusHandler)
+	}
+
+	DashboardGroup := api.Group("/dashboard")
+	DashboardGroup.Use(middleware.JWTAuthMiddleware())
+	{
+		DashboardGroup.GET("/Getdashboard", dashboard.GetDashboardHandler)
 	}
 }
